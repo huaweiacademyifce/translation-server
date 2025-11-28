@@ -15,14 +15,39 @@ wss.on("connection", (ws) => {
 
   ws.on("message", async (data) => {
     try {
-      const msg = JSON.parse(data.toString());
+      const rawData = data.toString();
+
+      // Tentar parse como JSON
+      let msg;
+      try {
+        msg = JSON.parse(rawData);
+      } catch {
+        // String simples - converter para utterance automático
+        console.log(`📝 Received plain text: "${rawData}"`);
+
+        // Obter metadata do cliente (se já fez join)
+        const clientData = clients.get(ws);
+
+        // Criar mensagem utterance automaticamente
+        msg = {
+          type: "utterance",
+          utteranceId: `msg-${Date.now()}`,
+          speakerId: clientData?.clientId || "unknown",
+          roomId: clientData?.roomId || "default-room",
+          language: clientData?.language || "pt-BR",
+          text: rawData,
+        };
+
+        console.log("🔄 Converted to utterance:", msg);
+      }
+
       await handleMessage(ws, msg, clients);
     } catch (err) {
       console.error("Error handling message:", err);
       ws.send(
         JSON.stringify({
           type: "error",
-          message: "Invalid message format",
+          message: "Error processing message",
         })
       );
     }
