@@ -35,6 +35,13 @@ export async function translateText({ text, from, to }) {
   try {
     const url = `${endpoint}/translate`;
 
+    console.log(`\n    🌐 REQUISIÇÃO AZURE TRANSLATOR`);
+    console.log(`    URL: ${url}`);
+    console.log(`    De: ${from} → Para: ${to}`);
+    console.log(
+      `    Texto: "${text.substring(0, 50)}${text.length > 50 ? "..." : ""}"`
+    );
+
     const response = await axios({
       method: "post",
       url,
@@ -58,18 +65,21 @@ export async function translateText({ text, from, to }) {
     const translations = response.data?.[0]?.translations;
     if (!translations || translations.length === 0) {
       console.warn(
-        "[WARN] No translations returned from Azure.",
+        `    ⚠️  Nenhuma tradução retornada pela Azure`,
         response.data
       );
       return text;
     }
 
-    return translations[0].text;
+    const translatedText = translations[0].text;
+    console.log(`    ✅ TRADUÇÃO RECEBIDA: "${translatedText}"`);
+    return translatedText;
   } catch (err) {
     console.error(
-      "[ERROR] Failed to translate text:",
+      `    ❌ ERRO NA TRADUÇÃO:`,
       err.response?.data || err.message
     );
+    console.log(`    ⚠️  Usando texto original como fallback`);
     // fallback pra não travar a app
     return text;
   }
