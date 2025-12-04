@@ -75,12 +75,12 @@ async function handleUtterance(ws, msg, clients, connId) {
   const roomClients = getClientsInRoom(clients, roomId);
   console.log(`\n📊 Clientes na sala "${roomId}": ${roomClients.length}`);
 
-  if (roomClients.length === 0) {
-    console.warn(
-      `⚠️  AVISO: Nenhum cliente na sala "${roomId}" para receber tradução`
-    );
-    return;
-  }
+  // if (roomClients.length === 0) {
+  //   console.warn(
+  //     `⚠️  AVISO: Nenhum cliente na sala "${roomId}" para receber tradução`
+  //   );
+  //   return;
+  // }
 
   // Para cada cliente na sala
   console.log(`\n🔄 ENVIANDO PARA CADA CLIENTE NA SALA:`);
