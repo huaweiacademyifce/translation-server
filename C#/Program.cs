@@ -87,7 +87,8 @@ public class TranslationChatClient
                 utteranceId = Guid.NewGuid().ToString(),
                 speakerId = _clientId,
                 roomId = _roomId,
-                language = _language,
+                originalLanguage = _language, // Corrigido!
+                targetLanguage = _language,   // Corrigido! (ou defina para o idioma desejado)
                 text = text
             };
 
@@ -253,7 +254,7 @@ public class Program
         Console.Write("URL do servidor (deixe vazio para ws://localhost:8080): ");
         string serverUrl = Console.ReadLine() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(serverUrl))
-            serverUrl = "ws://localhost:8600";
+            serverUrl = "ws://localhost:9000";
 
         Console.WriteLine();
 

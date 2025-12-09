@@ -2,7 +2,7 @@ import "dotenv/config";
 import { WebSocketServer } from "ws";
 import { handleMessage, handleDisconnect } from "./websocket.js";
 
-const PORT = process.env.PORT || 8600;
+const PORT = process.env.PORT || 9000;
 
 // Map de conexões -> metadata do cliente
 // ws => { clientId, roomId, language }
@@ -24,6 +24,8 @@ wss.on("connection", (ws) => {
   console.log();
 
   ws.on("message", async (data) => {
+    // Log detalhado do que chega pelo websocket
+    console.log("\n[DEBUG] Mensagem recebida no WebSocket:", data);
     try {
       const rawData = data.toString();
       const msgTimestamp = new Date().toLocaleTimeString("pt-BR");
@@ -44,10 +46,15 @@ wss.on("connection", (ws) => {
       let msg;
       try {
         msg = JSON.parse(rawData);
+        if (!msg.type) {
+          console.error(`❌ Tipo de mensagem desconhecido: ${msg.type}`);
+          ws.send(JSON.stringify({ type: "error", message: "Mensagem sem tipo definido." }));
+          return;
+        }
         console.log(`✅ JSON válido detectado`);
         console.log(`📋 Tipo de mensagem: ${msg.type}`);
         console.log(`📋 Conteúdo:`);
-        console.log(JSON.stringify(msg, null, 2));
+        console.log(JSON.stringify(msg, null, 2));q
       } catch (parseError) {
         // String simples - converter para utterance automático
         console.log(`⚠️  Não é JSON, detectado como string simples`);
@@ -102,7 +109,9 @@ wss.on("connection", (ws) => {
       console.log(`   Sala: ${clientData.roomId}`);
       console.log(`   Idioma: ${clientData.language}`);
     }
-    console.log(`📊 Clientes restantes: ${wss.clients.size - 1}`);
+    // Corrige para nunca mostrar número negativo
+    const remaining = Math.max(0, wss.clients.size - 1);
+    console.log(`📊 Clientes restantes: ${remaining}`);
     console.log(`${"=".repeat(80)}\n`);
     handleDisconnect(ws, clients);
   });
